@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Corcyra</title>
+
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link href="theme.css" rel="stylesheet">
+
+	<link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.11/themes/css/cartodb.css" />
+
+	<style>
+		html, body {width:100%; height:100%; padding: 0; margin: 0;}
+		#cartodb-map {width: 100%; height:100%; background: black;}
+		#slider {position: absolute; bottom: 40px; right: 40px; left:40px;}
+		#legend {font-family: serif; font-size: 27px; position: absolute; bottom: 40px; left: 40px;}
+	</style>
+	<style type="text/css">
+		.green {
+			background:#14b866;
+		}
+ </style>
+
+	<div id="map"></div>
+    <div id="slider"></div>
+    <div id="legend"></div>
+
+	  <script>
+
+    var map;
+    function init(){
+      // initiate leaflet map
+      map = new L.Map('cartodb-map', {
+		zoomControl: false,
+        center: [40,25],
+        zoom: 6
+      })
+
+	new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
+
+	var myLayers = L.tileLayer('http://{s}.tiles.mapbox.com/v4/gabrielleh.o10ic6ml/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZ2FicmllbGxlaCIsImEiOiJjaWdhd2toNXMxOWF6dmlseDRiem93bTI3In0.HZ7mExYcek13JU3nhgQVmQ', {
+  attribution: 'Mapbox <a href="http://mapbox.com/about/maps" target="_blank">Terms &amp; Feedback</a>'}).addTo(map);
+
+	myLayers.setOpacity(.4);
+
+	var layerUrl = 'https://olivierid.carto.com/api/v2/viz/1634af88-3be5-11e7-8815-0ee66e2c9693/viz.json';
+
+	var sublayers = [];
+
+		cartodb.createLayer(map, layerUrl)
+		.addTo(map)
+		.on('done', function(layer) {
+
+		var subLayerOptions = {
+      sql: "SELECT * FROM lines",
+      cartocss: "#lines{  line-width: 3;  line-opacity: 1;  line-dasharray: 5,5;} #lines[author='Epictetus'] {  line-color: #3EA99F;} #lines[author='Galen'] {line-color: #4E9258;} #lines[author='Strabo'] {line-color: #52D017;} #lines[author='Xenophon'] {line-color: #B1FB17;} #lines[author='Caesar'] {	line-color: #800517; } #lines[author='Cicero'] {   line-color: #F70D1A;} #lines[author='Gellius'] {line-color: #F75D59; } #lines[author='Jerome'] {line-color: #FFDFDD; } #lines[author='Justinian'] {line-color: #C48793;} #lines[author='Suetonius'] {line-color: #B041FF;} #lines[author='Unknown'] {line-color: #000000;}"    }
+
+    var sublayer = layer.getSubLayer(0);
+
+    sublayer.set(subLayerOptions);
+
+		sublayers.push(sublayer);
+		}).on('error', function() {
+			//log the error
+  });
+
+	var layer2Url = 'https://olivierid.carto.com/api/v2/viz/40f2319a-3be6-11e7-90d2-0e3ebc282e83/viz.json';
+
+	var sublayers2 = [];
+
+		cartodb.createLayer(map, layer2Url)
+		.addTo(map)
+		.on('done', function(layer) {
+
+		var subLayer2Options = {
+      sql: "SELECT * FROM points",
+	  }
+
+    var sublayer2 = layer.getSubLayer(0);
+
+    sublayer2.set(subLayer2Options);
+
+		sublayers.push(sublayer2);
+		}).on('error', function() {
+			//log the error
+  });
+
+
+   var LayerActions = {
+  all: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge");
+	return true;
+  },
+  letter: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE genre = 'Letter'");
+    sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE genre = 'Letter'");
+	return true;
+  },
+  otherprose: function(){
+	sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE genre = 'Other Prose'");
+    sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE genre = 'Other Prose'");
+    return true;
+  },
+  autobiography: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE genre = 'Autobiography'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE genre = 'Autobiography'");
+    return true;
+  },
+   biography: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE genre = 'Biography'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE genre = 'Biography'");
+    return true;
+  },
+   chronicle: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE genre = 'Chronicle'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE genre = 'Chronicle'");
+    return true;
+  },
+   geography: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE genre = 'Geography'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE genre = 'Geography'");
+    return true;
+  },
+   philosophy: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE genre = 'Philosophy'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE genre = 'Philosophy'");
+    return true;
+  },
+   greek: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE language = 'Greek'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE language = 'Greek'");
+    return true;
+  },
+   latin: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE language = 'Latin'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE language = 'Latin'");
+    return true;
+  },
+  land: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE mode_of_travel = 'Land'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE language = 'arbitrary'");
+    return true;
+  },
+  march: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE mode_of_travel = 'March'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE language = 'arbitrary'");
+    return true;
+  },
+  sea: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE mode_of_travel = 'Sea'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE language = 'arbitrary'");
+    return true;
+  },
+  unknownmodeoftravel: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE mode_of_travel = ''");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE language = 'arbitrary'");
+    return true;
+  },
+     caesar: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Caesar'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Caesar'");
+    return true;
+  },
+   cicero: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Cicero'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Cicero'");
+    return true;
+  },
+  epictetus: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Epictetus'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Epictetus'");
+    return true;
+  },
+  galen: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Galen'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Galen'");
+    return true;
+  },
+  gellius: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Gellius'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Gellius'");
+    return true;
+  },
+  jerome: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Jerome'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Jerome'");
+    return true;
+  },
+  justinian: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Justinian'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Justinian'");
+    return true;
+  },
+  strabo: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Strabo'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Strabo'");
+    return true;
+  },
+   suetonius: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Suetonius'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Suetonius'");
+    return true;
+  },
+   unknownauthor: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Unknown'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Unknown'");
+    return true;
+  },
+   xenophon: function(){
+    sublayers[0].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Xenophon'");
+	sublayers[1].setSQL("SELECT * FROM cassiope_and_corcyra_journey_finals_copy_merge WHERE author = 'Xenophon'");
+    return true;
+  },
+}
+
+
+  $('.button').click(function() {
+	$('.button').removeClass('green');
+	$(this).addClass('green');
+	LayerActions[$(this).attr('id')]();
+});
+
+}
+  </script>
+
+  </head>
+
+  <body role="document">
+
+  <body onload="init()">
+
+  <div id='cartodb-map'></div>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Cassiope</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Author <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+			    <li><a href="#caesar" id="caesar" class="button caesar">Caesar</a></li>
+				<li><a href="#cicero" id="cicero" class="button cicero">Cicero</a></li>
+				<li><a href="#epictetus" id="epictetus" class="button epictetus">Epictetus</a></li>
+				<li><a href="#galen" id="galen" class="button galen">Galen</a></li>
+				<li><a href="#gellius" id="gellius" class="button gellius">Gellius</a></li>
+				<li><a href="#jerome" id="jerome" class="button jerome">Jerome</a></li>
+				<li><a href="#justinian" id="justinian" class="button justinian">Justinian</a></li>
+				<li><a href="#strabo" id="strabo" class="button strabo">Strabo</a></li>
+				<li><a href="#suetonius" id="suetonius" class="button suetonius">Suetonius</a></li>
+				<li><a href="#unknownauthor" id="unknownauthor" class="button unknownauthor">Unknown</a></li>
+				<li><a href="#xenophon" id="xenophon" class="button xenophon">Xenophon</a></li>
+				<li role="separator" class="divider"></li>
+				<li><a href="#all" id="all" class="button all">All</a></li>
+              </ul>
+            </li>
+			<li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-multiselectable="true">Genre <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+				<li><a href="#autobiography" name="genre" id="autobiography" class="button autobiography">Autobiography</a></li>
+				<li><a href="#chronicle" name="genre" id="chronicle" class="button chronicle">Chronicle</a></li>
+				<li><a href="#biography" name="genre" id="biography" class="button biography">Biography</a></li>
+				<li><a href="#geography" name="genre" id="geography" class="button geography">Geography</a></li>
+				<li><a href="#letter" name="genre" id="letter" class="button letter">Letter</a></li>
+				<li><a href="#otherprose" name="genre" id="otherprose" class="button otherprose">Other Prose</a></li>
+				<li><a href="#philosophy" name="genre" id="philosophy" class="button philosophy">Philosophy</a></li>
+			    <li role="separator" class="divider"></li>
+				<li><a href="#all" id="all" class="button all">All</a></li>
+			   </ul>
+            </li>
+			<li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Language <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+			    <li><a href="#greek" id="greek" class="button greek">Greek</a></li>
+				<li><a href="#latin" id="latin" class="button latin">Latin</a></li>
+				<li role="separator" class="divider"></li>
+				<li><a href="#all" id="all" class="button all">All</a></li>
+              </ul>
+            </li>
+			<li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Mode of Travel <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+			    <li><a href="#land" id="land" class="button land">Land</a></li>
+				<li><a href="#march" id="march" class="button march">March</a></li>
+				<li><a href="#sea" id="sea" class="button sea">Sea</a></li>
+				<li><a href="#unknownmodeoftravel" id="unknownmodeoftravel" class="button unknownmodeoftravel">Unknown</a></li>
+				<li role="separator" class="divider"></li>
+				<li><a href="#all" id="all" class="button all">All</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="http://libs.cartocdn.com/cartodb.js/v3/3.11/cartodb.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  </body>
+</html>
