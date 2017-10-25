@@ -1,0 +1,8 @@
+{
+  "name": "corcyra",
+  "description": "a mapping app",
+  "version": "1.0.0",
+  "engines": {
+    "node": "6.11.3"
+  }
+}
